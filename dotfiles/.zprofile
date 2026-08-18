@@ -1,3 +1,4 @@
-if [[ -f /opt/homebrew/bin/brew ]] && [[ -L "$HOME/.homebrew" ]]; then
-	eval "$(/opt/homebrew/bin/brew shellenv)"
+if [[ -f "$HOME/.local/lib/shell/homebrew_macos.sh" ]]; then
+	source "$HOME/.local/lib/shell/homebrew_macos.sh"
+	homebrew_macos_activate
 fi

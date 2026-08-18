@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
 
-if [[ "$OSTYPE" == "darwin"* ]] && [[ -L "$HOME/.homebrew" ]]; then
-
-	# .homebrew is an empty file created by GNU Stow.
-	# It is there to prevent a potential privilege escalation attack
-	# on a host due to a misconfigured (777) /opt directory.
-
-	if [[ -f /opt/homebrew/bin/brew ]]; then
-		eval "$(/opt/homebrew/bin/brew shellenv)"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	if [[ -f "$HOME/.local/lib/shell/homebrew_macos.sh" ]]; then
+		source "$HOME/.local/lib/shell/homebrew_macos.sh"
+		homebrew_macos_activate
 	fi
 
 	if command -v brew &>/dev/null; then

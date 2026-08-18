@@ -20,7 +20,6 @@ fi
 # fzf
 if command -v fzf &>/dev/null &&
 	command -v brew &>/dev/null &&
-	[[ -f "$(brew --prefix)/opt/fzf/shell/completion.bash" ]] &&
-	[[ -L "$HOME/.homebrew" ]]; then
+	[[ -f "$(brew --prefix)/opt/fzf/shell/completion.bash" ]]; then
 	source "$(brew --prefix)/opt/fzf/shell/completion.bash"
 fi
