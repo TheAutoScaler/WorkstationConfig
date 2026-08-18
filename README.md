@@ -44,6 +44,12 @@ xargs brew install < brew_formulae_macos
 xargs brew install < brew_casks
 ```
 
+The shell activates Homebrew only after checking the ownership and permissions
+of `/opt`, `/opt/homebrew`, its `bin` directory, and the `brew` executable.
+These checks retain the protection against a hostile world-writable install
+path without claiming `~/.homebrew`, which Homebrew uses for user configuration
+such as third-party tap trust decisions.
+
 ### Firefox
 
 Complete Firefox because dotfiles because we will need to overrite the files
