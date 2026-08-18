@@ -3,8 +3,7 @@
 # fzf
 if command -v fzf &>/dev/null &&
 	command -v brew &>/dev/null &&
-	[[ -f "$(brew --prefix)/opt/fzf/shell/key-bindings.bash" ]] &&
-	[[ -L "$HOME/.homebrew" ]]; then
+	[[ -f "$(brew --prefix)/opt/fzf/shell/key-bindings.bash" ]]; then
 	source "$(brew --prefix)/opt/fzf/shell/key-bindings.bash"
 
 	if [[ -f "$HOME/.local/share/fzf/fzf.git.sh" ]]; then
