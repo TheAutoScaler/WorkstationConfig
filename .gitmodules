@@ -1,0 +1,6 @@
+[submodule "dotfiles/.local/share/nvim/site/pack/james/start/nvim-lspconfig"]
+	path = dotfiles/.local/share/nvim/site/pack/james/start/nvim-lspconfig
+	url = https://github.com/neovim/nvim-lspconfig.git
+[submodule "dotfiles/.local/share/nvim/site/pack/james/start/gitsigns.nvim"]
+	path = dotfiles/.local/share/nvim/site/pack/james/start/gitsigns.nvim
+	url = https://github.com/lewis6991/gitsigns.nvim.git
