@@ -15,12 +15,19 @@ homebrew_macos_is_trusted() {
 	for path in "${trusted_paths[@]}"; do
 		[[ -e "$path" ]] || return 1
 
-		owner=$(stat -f '%Su' "$path") || return 1
+		# Homebrew's coreutils gnubin directory may put GNU stat ahead of the
+		# macOS utility. Use the system binary because these format strings are
+		# intentionally BSD stat syntax.
+		owner=$(/usr/bin/stat -f '%Su' "$path") || return 1
 		[[ "$owner" == root || "$owner" == "$USER" ]] || return 1
 
-		mode=$(stat -f '%OLp' "$path") || return 1
+		mode=$(/usr/bin/stat -f '%OLp' "$path") || return 1
 		((8#$mode & 0002)) && return 1
 	done
+
+	# A successful final arithmetic check has status 1 because the path is not
+	# world-writable. Return success explicitly after every path has passed.
+	return 0
 }
 
 homebrew_macos_activate() {
