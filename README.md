@@ -50,6 +50,7 @@ These checks retain the protection against a hostile world-writable install
 path without claiming `~/.homebrew`, which Homebrew uses for user configuration
 such as third-party tap trust decisions.
 
+
 ### Firefox
 
 Complete Firefox because dotfiles because we will need to overrite the files
@@ -188,3 +189,21 @@ menu bar.
 
 - Don't symlink the preferences file, as iTerm2 doesn't support this and
   changes will be lost.
+
+## Ghostty
+
+Ghostty reads its version-controlled configuration from
+`~/.config/ghostty/config`, which GNU Stow links to
+`~/Config/dotfiles/.config/ghostty/config` with the rest of the dotfiles.
+
+The configuration reproduces the former iTerm2 profile's Hack Nerd Font Mono
+at 14 pt, 110-column by 35-row initial window size, Solarized Light theme, and
+1,000-line scrollback limit.
+
+Left Option acts as terminal Meta so shell and editor shortcuts continue to
+work, while Right Option retains normal macOS character composition. The
+explicit Option-3 mapping preserves access to `#` on a UK keyboard despite
+using Left Option as Meta. Shift-Enter is intentionally left at Ghostty's
+default rather than carrying over iTerm2's old explicit newline mapping.
+
+Reload the configuration in a running Ghostty window with `Command-Shift-,`.

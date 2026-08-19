@@ -27,6 +27,7 @@ local dependencies = {
 			end,
 		},
 		{ name = "gitsigns.nvim", module = "gitsigns" },
+		{ name = "sidekick.nvim", module = "sidekick" },
 	},
 	executables = {
 		-- Include both direct tools and secondary commands used behind an LSP.
@@ -41,6 +42,7 @@ local dependencies = {
 		{ name = "eslint", feature = "ESLint language server" },
 		{ name = "terraform", feature = "Terraform language server" },
 		{ name = "golangci-lint", feature = "golangci-lint language server" },
+		{ name = "codex", feature = "Sidekick AI CLI integration" },
 	},
 }
 

@@ -48,6 +48,46 @@ if gitsigns_ok then
 	gitsigns.setup()
 end
 
+-- Sidekick provides a Neovim-native terminal for the already authenticated
+-- Codex CLI. Next Edit Suggestions are deliberately disabled because they
+-- require GitHub Copilot, which is not part of this workstation setup. Keep
+-- the existing Tab buffer navigation untouched and expose only explicit AI
+-- mappings under <leader>a.
+local sidekick_ok, sidekick = pcall(require, "sidekick")
+if sidekick_ok then
+	sidekick.setup({
+		nes = { enabled = false },
+		cli = {
+			win = {
+				keys = {
+					-- Keep a single Escape available to Codex for cancelling and
+					-- dismissing its UI; a deliberate double Escape returns to
+					-- Neovim's Normal mode.
+					exit_terminal_mode = {
+						"<esc><esc>",
+						"stopinsert",
+						mode = "t",
+						desc = "Exit Sidekick terminal mode",
+					},
+				},
+			},
+		},
+	})
+
+	vim.keymap.set("n", "<leader>aa", function()
+		require("sidekick.cli").toggle({ name = "codex", focus = true })
+	end, { desc = "Toggle Sidekick Codex" })
+	vim.keymap.set("n", "<leader>af", function()
+		require("sidekick.cli").send({ msg = "{file}" })
+	end, { desc = "Send file to Sidekick" })
+	vim.keymap.set("x", "<leader>av", function()
+		require("sidekick.cli").send({ msg = "{selection}" })
+	end, { desc = "Send selection to Sidekick" })
+	vim.keymap.set({ "n", "x" }, "<leader>ap", function()
+		require("sidekick.cli").prompt()
+	end, { desc = "Select Sidekick prompt" })
+end
+
 require("keymaps")
 require("autocmds")
 config_health.setup()

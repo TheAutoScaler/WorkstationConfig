@@ -1,0 +1,17 @@
+# Reproduce the visual defaults from the former iTerm2 profile.
+font-family = Hack Nerd Font Mono
+font-size = 14
+
+window-width = 110
+window-height = 35
+
+theme = iTerm2 Solarized Light
+background-opacity = 1
+
+scrollback-limit = 1000
+
+# Use Left Option as terminal Meta while leaving Right Option available for
+# ordinary macOS character composition. Since the UK keyboard normally uses
+# Option-3 for the hash sign, preserve the explicit iTerm2 exception as well.
+macos-option-as-alt = left
+keybind = alt+3=text:\x23
