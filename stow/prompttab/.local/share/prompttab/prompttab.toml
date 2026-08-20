@@ -1,0 +1,9 @@
+# Automatically prefer the resident local model and use Codex when unavailable.
+backend = "auto"
+
+[local]
+name = "Qwen2.5 Coder 1.5B"
+url = "http://127.0.0.1:8012"
+max_tokens = 32
+temperature = 0
+timeout_ms = 750

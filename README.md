@@ -110,6 +110,8 @@ through `dotfiles/.bashrc.d/prompttab.sh`, so its installer is told not to edit
 Install or refresh it with:
 
 ```bash
+mkdir -p "$HOME/.local/share/prompttab"
+stow --restow --dir "$HOME/Config/stow" --target "$HOME" prompttab
 git submodule update --init --recursive \
     dotfiles/.local/share/PromptTab
 PROMPTTAB_HOME="$HOME/.local/share/prompttab" \
@@ -117,11 +119,55 @@ PROMPTTAB_MANAGE_BASHRC=0 \
     dotfiles/.local/share/PromptTab/install.sh
 ```
 
+The targeted Stow package owns `prompttab.toml`, including automatic backend
+selection, the local model display name, URL, and generation limits. PromptTab's
+installer owns the remaining runtime files and preserves the existing configuration
+symlink. The file contains no credentials or authentication material.
+
 The tracked fragment loads PromptTab conditionally, so a machine without it
 installed still starts Bash normally. Reload the configuration after installation:
 
 ```bash
 source "$HOME/.bashrc"
+```
+
+PromptTab's local backend uses Homebrew's `llama.cpp` and a resident
+`llama-server`. The selected model is Qwen2.5-Coder-1.5B Base Q5_K_M. llama.cpp
+downloads and caches that model automatically from Hugging Face when first started:
+
+```bash
+brew install llama.cpp
+llama-server \
+    -hf MaziyarPanahi/Qwen2.5-Coder-1.5B-GGUF:Q5_K_M \
+    --host 127.0.0.1 --port 8012 \
+    --n-gpu-layers 99 --ctx-size 2048 --parallel 1 --cache-reuse 256 \
+    --cors-origins http://127.0.0.1:8012 --no-webui
+```
+
+The server is managed at login by the Stow-tracked user LaunchAgent
+`~/Library/LaunchAgents/dev.prompttab.llama-server.plist`. It binds only to
+loopback, disables the llama.cpp web UI, keeps one model resident for low latency,
+and restarts automatically if it exits. Its Stow-managed launcher derives the log
+path from `$HOME`, so the setup does not assume a macOS account name. Install or
+refresh the configuration and agent with:
+
+```bash
+cd "$HOME/Config"
+stow --restow --dir "$HOME/Config/stow" --target "$HOME" prompttab
+stow --restow --dir "$HOME/Config/dotfiles/Library/LaunchAgents" \
+    --target "$HOME/Library/LaunchAgents" .
+launchctl bootout "gui/$UID/dev.prompttab.llama-server" 2>/dev/null || true
+launchctl bootstrap "gui/$UID" \
+    "$HOME/Library/LaunchAgents/dev.prompttab.llama-server.plist"
+launchctl kickstart -k "gui/$UID/dev.prompttab.llama-server"
+```
+
+The first start may take longer while the model downloads. Check readiness and
+logs with:
+
+```bash
+curl -fsS http://127.0.0.1:8012/health
+tail -f "$HOME/Library/Logs/prompttab-llama.log"
 ```
 
 ### Neovim additions
