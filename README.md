@@ -110,16 +110,16 @@ through `dotfiles/.bashrc.d/prompttab.sh`, so its installer is told not to edit
 Install or refresh it with:
 
 ```bash
-mkdir -p "$HOME/.local/share/prompttab"
-stow --restow --dir "$HOME/Config/stow" --target "$HOME" prompttab
+cd "$HOME/Config"
+stow --restow dotfiles
 git submodule update --init --recursive \
-    dotfiles/.local/share/PromptTab
+    submodules/PromptTab
 PROMPTTAB_HOME="$HOME/.local/share/prompttab" \
 PROMPTTAB_MANAGE_BASHRC=0 \
-    dotfiles/.local/share/PromptTab/install.sh
+    submodules/PromptTab/install.sh
 ```
 
-The targeted Stow package owns `prompttab.toml`, including automatic backend
+The `dotfiles` Stow package owns `prompttab.toml`, including automatic backend
 selection, the local model display name, URL, and generation limits. PromptTab's
 installer owns the remaining runtime files and preserves the existing configuration
 symlink. The file contains no credentials or authentication material.
@@ -153,9 +153,7 @@ refresh the configuration and agent with:
 
 ```bash
 cd "$HOME/Config"
-stow --restow --dir "$HOME/Config/stow" --target "$HOME" prompttab
-stow --restow --dir "$HOME/Config/dotfiles/Library/LaunchAgents" \
-    --target "$HOME/Library/LaunchAgents" .
+stow --restow dotfiles
 launchctl bootout "gui/$UID/dev.prompttab.llama-server" 2>/dev/null || true
 launchctl bootstrap "gui/$UID" \
     "$HOME/Library/LaunchAgents/dev.prompttab.llama-server.plist"
