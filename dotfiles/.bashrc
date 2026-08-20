@@ -26,6 +26,7 @@ bashrc_files=(
 	"$HOME/.bashrc.d/env_vars.sh"
 	"$HOME/.bashrc.d/git.sh"
 	"$HOME/.bashrc.d/key-bindings.sh"
+	"$HOME/.bashrc.d/prompttab.sh"
 	"$HOME/.bashrc.d/notes.sh"
 )
 
