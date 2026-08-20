@@ -100,6 +100,30 @@ Make Bash the default shell:
 # chsh -s "/opt/homebrew/bin/bash" "james"
 ```
 
+#### PromptTab
+
+PromptTab is pinned as a Git submodule and installed into its isolated runtime
+directory at `~/.local/share/prompttab`. Shell startup remains version controlled
+through `dotfiles/.bashrc.d/prompttab.sh`, so its installer is told not to edit
+`~/.bashrc` directly.
+
+Install or refresh it with:
+
+```bash
+git submodule update --init --recursive \
+    dotfiles/.local/share/PromptTab
+PROMPTTAB_HOME="$HOME/.local/share/prompttab" \
+PROMPTTAB_MANAGE_BASHRC=0 \
+    dotfiles/.local/share/PromptTab/install.sh
+```
+
+The tracked fragment loads PromptTab conditionally, so a machine without it
+installed still starts Bash normally. Reload the configuration after installation:
+
+```bash
+source "$HOME/.bashrc"
+```
+
 ### Neovim additions
 
 The Neovim setup is intended to be portable to a newly provisioned machine

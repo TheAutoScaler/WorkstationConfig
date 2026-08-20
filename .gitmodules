@@ -7,3 +7,6 @@
 [submodule "dotfiles/.local/share/nvim/site/pack/james/start/sidekick.nvim"]
 	path = dotfiles/.local/share/nvim/site/pack/james/start/sidekick.nvim
 	url = https://github.com/folke/sidekick.nvim.git
+[submodule "dotfiles/.local/share/PromptTab"]
+	path = dotfiles/.local/share/PromptTab
+	url = https://github.com/TheAutoScaler/PromptTab.git
