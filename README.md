@@ -149,38 +149,6 @@ older than the source, so generated machine data does not need to be committed.
 defaults write com.apple.TextEdit NSShowAppCentricOpenPanelInsteadOfUntitledFile -bool false
 ```
 
-### WindowTools
-
-WindowTools provides “always on top” and “minimize all” controls in the macOS
-menu bar.
-Build the standalone app, then use `ditto` to copy the complete app bundle into
-`/Applications` while preserving its directory structure and macOS metadata:
-
-```
-cd "$HOME/Config/WindowTools"
-./build-app.sh
-ditto build/WindowTools.app /Applications/WindowTools.app
-open /Applications/WindowTools.app
-```
-
-The build script applies an ad-hoc signature with `codesign --sign -`. This
-makes the app bundle internally consistent for local use, but it is not signed
-with an Apple Developer ID and is not notarized. macOS may therefore ask you to
-confirm the first launch. Grant Accessibility permission only after copying the
-app to `/Applications`, because that permission is associated with the app's
-code identity and location. Rebuilding and replacing the app changes its code
-signature and may require Accessibility permission to be granted again. A
-stable Developer ID signature would avoid most of that permission churn.
-
-Grant Accessibility and Screen Recording permission to WindowTools under
-**System Settings > Privacy & Security**. Left-click its menu-bar pin to mirror
-the focused window in an always-on-top panel; right-click to select or unpin
-windows and quit.
-
-The adjacent minimize button minimizes all visible windows. The global
-`Control-Option-Command-M` shortcut performs the same action without using the
-menu bar.
-
 ## Restore iTerm2 settings
 
 - Settings > General > Settings > Load preferences from a custom folder or URL
