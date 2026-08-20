@@ -6,6 +6,7 @@ coreutils
 cue
 diffutils
 docker
+duti
 eslint
 fd
 file-formula

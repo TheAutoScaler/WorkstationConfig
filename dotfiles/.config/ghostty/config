@@ -10,6 +10,10 @@ background-opacity = 1
 
 scrollback-limit = 1000
 
+# Neovim Finder windows close when their editor exits. Quit Ghostty as well
+# when that was its final window, while leaving any other terminals untouched.
+quit-after-last-window-closed = true
+
 # Use Left Option as terminal Meta while leaving Right Option available for
 # ordinary macOS character composition. Since the UK keyboard normally uses
 # Option-3 for the hash sign, preserve the explicit iTerm2 exception as well.

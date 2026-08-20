@@ -59,6 +59,9 @@ user_pref("browser.tabs.firefox-view", false);
 // use recommended performance settings
 user_pref("browser.preferences.defaultPerformanceSettings.enabled", true);
 
+// Disable AV1 video decoding; prefer VP9 or H.264
+user_pref("media.av1.enabled", false);
+
 // Turn web render on
 // user_pref("gfx.webrender.all", true);
 // Note: buggy

@@ -207,3 +207,22 @@ using Left Option as Meta. Shift-Enter is intentionally left at Ghostty's
 default rather than carrying over iTerm2's old explicit newline mapping.
 
 Reload the configuration in a running Ghostty window with `Command-Shift-,`.
+
+### Open Markdown and text files in Neovim from Finder
+
+Finder requires an application bundle for file associations, so
+`NeovimFinder/install.sh` builds a small native `Neovim.app` wrapper. The app
+opens selected Markdown, plain-text, source-code, and configuration files in
+Homebrew Neovim inside a new Ghostty window and safely preserves paths
+containing spaces or shell metacharacters.
+
+Install or refresh the wrapper and its Finder associations with:
+
+```sh
+cd "$HOME/Config/NeovimFinder"
+./install.sh
+```
+
+The default installation is `/Applications/Neovim.app`. See
+`NeovimFinder/README.md` for prerequisites, installation overrides, and
+removal instructions.
