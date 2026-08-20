@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+log_dir="${HOME:?HOME must be set}/Library/Logs"
+mkdir -p "$log_dir"
+exec >>"$log_dir/prompttab-llama.log" 2>&1
+
+exec /opt/homebrew/bin/llama-server \
+    -hf MaziyarPanahi/Qwen2.5-Coder-1.5B-GGUF:Q5_K_M \
+    --host 127.0.0.1 \
+    --port 8012 \
+    --n-gpu-layers 99 \
+    --ctx-size 2048 \
+    --parallel 1 \
+    --cache-reuse 256 \
+    --cors-origins http://127.0.0.1:8012 \
+    --no-webui
