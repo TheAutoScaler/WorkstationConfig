@@ -1,2 +1,4 @@
 .DS_Store
 WindowTools/build/
+NeovimFinder/build/
+nvim.log
