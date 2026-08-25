@@ -5,6 +5,7 @@
 
 # Order of the array matters
 # Functions depend on Homebrew (for MacOS)
+# Maintenance reminders use Homebrew when it is available
 # Aliases depend on functions
 # Completion depend on Homebrew (for MacOS)
 # Hooks depend on Homebrew (for MacOS)
@@ -18,6 +19,7 @@
 
 bashrc_files=(
 	"$HOME/.bashrc.d/homebrew_macos.sh"
+	"$HOME/.bashrc.d/maintenance.sh"
 	"$HOME/.bashrc.d/functions.sh"
 	"$HOME/.bashrc.d/aliases.sh"
 	"$HOME/.bashrc.d/completion.sh"
