@@ -64,6 +64,7 @@ stow
 stylua
 terminal-notifier
 terraform-ls
+terraform-linters/tap/tflint
 tfenv
 tmux
 tree
