@@ -14,6 +14,31 @@ Dotfiles are managed with [GNU Stow](https://www.gnu.org/software/stow/), which
 symlinks them from this repository (cloned on my local machine) to the home
 directory.
 
+### Automatic GitHub sync
+
+The Stow-managed `dev.workstation.config-auto-sync` LaunchAgent checks this
+repository every five minutes. It commits all local changes on the checked-out
+branch and pushes that branch to `origin`. Before staging and again before
+committing, it runs Gitleaks; a missing scanner or any finding stops the sync.
+The same check is installed as a Git pre-commit hook for manual commits.
+
+Install the dependency and activate the automation:
+
+```bash
+brew install gitleaks
+cd "$HOME/Config"
+stow --restow dotfiles
+git config core.hooksPath .githooks
+launchctl bootout "gui/$UID/dev.workstation.config-auto-sync" 2>/dev/null || true
+launchctl bootstrap "gui/$UID" \
+    "$HOME/Library/LaunchAgents/dev.workstation.config-auto-sync.plist"
+launchctl kickstart -k "gui/$UID/dev.workstation.config-auto-sync"
+```
+
+The agent writes diagnostics to `~/Library/Logs/config-auto-sync.log`. Gitleaks
+is a strong safeguard, not a guarantee: keep credentials outside this repository
+and rotate any credential that is ever committed.
+
 ## Installation instructions
 
 Install Homebrew:
