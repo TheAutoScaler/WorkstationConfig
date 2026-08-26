@@ -26,7 +26,10 @@ if ! git -C "$repo" diff --quiet ||
     gitleaks dir "$repo" --redact --no-banner
     git -C "$repo" add --all
     gitleaks git "$repo" --pre-commit --staged --redact --no-banner
-    git -C "$repo" commit -m "chore: auto-sync config $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+    # Background jobs cannot answer an SSH signing-key prompt. This override is
+    # limited to automatic commits; the user's normal Git setting is unchanged.
+    git -C "$repo" -c commit.gpgsign=false commit \
+        -m "chore: auto-sync config $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 fi
 
 # Push the checked-out branch. Configure its upstream on the first run.
