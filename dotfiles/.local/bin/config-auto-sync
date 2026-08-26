@@ -31,7 +31,7 @@ fi
 if ! mkdir "$lock_dir" 2>/dev/null; then
     exit 0
 fi
-trap 'rmdir "$lock_dir"' EXIT HUP INT TERM
+trap 'rmdir "$lock_dir"' 0 HUP INT TERM
 
 if ! command -v gitleaks >/dev/null 2>&1; then
     echo "config-auto-sync: refusing to sync because gitleaks is not installed"
