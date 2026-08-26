@@ -1,0 +1,60 @@
+#!/bin/sh
+set -eu
+
+repo="${HOME:?HOME must be set}/Config"
+config_file="$HOME/.config-auto-sync"
+lock_dir="$HOME/Library/Caches/config-auto-sync.lock"
+log_file="$HOME/Library/Logs/config-auto-sync.log"
+
+# This is deliberately an untracked, per-machine opt-in. Installing the
+# portable dotfiles alone must never enable automatic GitHub pushes.
+if test ! -f "$config_file"; then
+    exit 0
+fi
+
+mkdir -p "$(dirname "$log_file")" "$(dirname "$lock_dir")"
+exec >>"$log_file" 2>&1
+
+IFS= read -r sync_branch < "$config_file" || true
+if test -z "$sync_branch" ||
+    ! git check-ref-format --branch "$sync_branch" >/dev/null 2>&1; then
+    echo "config-auto-sync: invalid or missing branch in $config_file"
+    exit 1
+fi
+
+current_branch=$(git -C "$repo" branch --show-current)
+if test "$current_branch" != "$sync_branch"; then
+    echo "config-auto-sync: refusing to sync $current_branch; configured branch is $sync_branch"
+    exit 1
+fi
+
+if ! mkdir "$lock_dir" 2>/dev/null; then
+    exit 0
+fi
+trap 'rmdir "$lock_dir"' EXIT HUP INT TERM
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+    echo "config-auto-sync: refusing to sync because gitleaks is not installed"
+    exit 1
+fi
+
+if ! git -C "$repo" diff --quiet ||
+    ! git -C "$repo" diff --cached --quiet ||
+    test -n "$(git -C "$repo" ls-files --others --exclude-standard)"; then
+    # Scan the complete working tree before staging, then scan the exact staged
+    # snapshot. Either check failing prevents both the commit and the push.
+    gitleaks dir "$repo" --redact --no-banner
+    git -C "$repo" add --all
+    gitleaks git "$repo" --pre-commit --staged --redact --no-banner
+    # Background jobs cannot answer an SSH signing-key prompt. This override is
+    # limited to automatic commits; the user's normal Git setting is unchanged.
+    git -C "$repo" -c commit.gpgsign=false commit \
+        -m "chore: auto-sync config $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+fi
+
+# Push only the configured branch. Configure its upstream on the first run.
+if git -C "$repo" rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
+    git -C "$repo" push
+else
+    git -C "$repo" push --set-upstream origin "$sync_branch"
+fi
