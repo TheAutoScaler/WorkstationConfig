@@ -17,9 +17,10 @@ directory.
 ### Automatic GitHub sync
 
 The Stow-managed `dev.workstation.config-auto-sync` LaunchAgent checks this
-repository every five minutes, but only on machines with the untracked opt-in
-file `~/.config-auto-sync`. It commits all local changes on the checked-out
-branch and pushes that branch to `origin`. Before staging and again before
+repository every five minutes, but only on machines with the untracked
+configuration file `~/.config-auto-sync`. Its first line assigns that machine
+a branch. The agent commits and pushes only when that exact branch is checked
+out; an invalid name or branch mismatch stops the sync. Before staging and again before
 committing, it runs Gitleaks; a missing scanner or any finding stops the sync.
 The same check is installed as a Git pre-commit hook for manual commits.
 
@@ -27,7 +28,7 @@ Install the dependency and activate the automation:
 
 ```bash
 brew install gitleaks
-touch "$HOME/.config-auto-sync"
+printf '%s\n' main > "$HOME/.config-auto-sync"
 cd "$HOME/Config"
 stow --restow dotfiles
 git config core.hooksPath .githooks
@@ -37,8 +38,10 @@ launchctl bootstrap "gui/$UID" \
 launchctl kickstart -k "gui/$UID/dev.workstation.config-auto-sync"
 ```
 
-Remove `~/.config-auto-sync` to disable automatic commits and pushes on that
-machine without changing the portable dotfiles.
+Use `main` on the primary machine and a dedicated branch name on each secondary
+machine. Check out the configured branch in `~/Config`; the agent deliberately
+does not switch branches itself. Remove `~/.config-auto-sync` to disable
+automatic commits and pushes without changing the portable dotfiles.
 
 The agent writes diagnostics to `~/Library/Logs/config-auto-sync.log`. Gitleaks
 is a strong safeguard, not a guarantee: keep credentials outside this repository
