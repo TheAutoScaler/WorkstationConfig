@@ -1,0 +1,13 @@
+{
+  "policies": {
+    "SearchEngines": {
+      "Add": [
+        {
+          "Name": "I'm Feeling Lucky",
+          "URLTemplate": "https://www.google.com/search?btnI=1&q={searchTerms}",
+          "Alias": "!"
+        }
+      ]
+    }
+  }
+}

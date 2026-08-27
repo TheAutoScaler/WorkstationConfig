@@ -104,6 +104,17 @@ firefox -p # Linux
 
 HINT: `Command+Shift+.` to show hidden files in the file picker on MacOS.
 
+Install the managed search-engine configuration on MacOS:
+
+```
+sudo mkdir -p /Applications/Firefox.app/Contents/Resources/distribution
+sudo cp "$HOME/Config/firefox/policies.json" \
+    /Applications/Firefox.app/Contents/Resources/distribution/policies.json
+```
+
+After restarting Firefox, type `! search terms` in the address bar to open
+Google's top result directly.
+
 ### Dotfiles
 
 Clone this repository, including its pinned Neovim plugin submodules:
