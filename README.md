@@ -104,12 +104,11 @@ firefox -p # Linux
 
 HINT: `Command+Shift+.` to show hidden files in the file picker on MacOS.
 
-Install the managed search-engine configuration on MacOS with the other
-dotfiles:
+Install the managed search-engine configuration system-wide on MacOS:
 
 ```
-cd "$HOME/Config"
-stow --restow dotfiles
+sudo stow --dir="$HOME/Config" --target=/Library/Preferences \
+    --restow firefox-policy
 ```
 
 After logging out and back in, restart Firefox. Type `! search terms` in the
