@@ -104,16 +104,15 @@ firefox -p # Linux
 
 HINT: `Command+Shift+.` to show hidden files in the file picker on MacOS.
 
-Install the managed search-engine configuration system-wide on MacOS:
+Remove the old Stow policy, if installed:
 
 ```
-sudo stow --dir="$HOME/Config" --target=/Library/Preferences \
-    --restow firefox-policy
+sudo unlink /Library/Preferences/org.mozilla.firefox.plist
 ```
 
-After logging out and back in, restart Firefox. Type `! search terms` in the
-address bar to open Google's top result directly. Confirm the policy is active
-at `about:policies`.
+Open `firefox-profile/Firefox-Feeling-Lucky.mobileconfig`, then approve it in
+System Settings under General > Device Management. Restart Firefox and confirm
+the policy at `about:policies`; type `! search terms` to use it.
 
 ### Dotfiles
 
