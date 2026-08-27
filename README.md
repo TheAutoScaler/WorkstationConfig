@@ -104,16 +104,17 @@ firefox -p # Linux
 
 HINT: `Command+Shift+.` to show hidden files in the file picker on MacOS.
 
-Install the managed search-engine configuration on MacOS:
+Install the managed search-engine configuration on MacOS with the other
+dotfiles:
 
 ```
-sudo mkdir -p /Applications/Firefox.app/Contents/Resources/distribution
-sudo cp "$HOME/Config/firefox/policies.json" \
-    /Applications/Firefox.app/Contents/Resources/distribution/policies.json
+cd "$HOME/Config"
+stow --restow dotfiles
 ```
 
-After restarting Firefox, type `! search terms` in the address bar to open
-Google's top result directly.
+After logging out and back in, restart Firefox. Type `! search terms` in the
+address bar to open Google's top result directly. Confirm the policy is active
+at `about:policies`.
 
 ### Dotfiles
 
