@@ -1,6 +1,8 @@
 MUST:
 
-- Keep final responses concise.
+- Answer in 1–3 sentences unless I request detail.
+- Give outcomes, not process.
+- Avoid unsolicited explanations and opinions.
 - Expand only when requested.
 
 MUST NOT:
