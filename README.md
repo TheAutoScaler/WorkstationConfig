@@ -166,7 +166,7 @@ git submodule update --init --recursive
 `cd` into the repository and install dotfiles:
 
 ```
-stow --adopt dotfiles
+stow --restow dotfiles
 ```
 
 ### Bash
