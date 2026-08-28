@@ -19,3 +19,4 @@ quit-after-last-window-closed = true
 # Option-3 for the hash sign, preserve the explicit iTerm2 exception as well.
 macos-option-as-alt = left
 keybind = alt+3=text:\x23
+keybind = cmd+period=esc:.
