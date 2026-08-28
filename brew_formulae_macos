@@ -43,6 +43,7 @@ marksman
 neovim
 node
 ollama
+opa
 openssh
 poetry
 prettier
@@ -51,6 +52,7 @@ pyright
 python
 qemu
 readline
+regal
 remarshal
 ripgrep
 rsync
@@ -69,6 +71,7 @@ terraform-linters/tap/tflint
 tfenv
 tmux
 tree
+trivy
 typescript-language-server
 ugrep
 unzip
