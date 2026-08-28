@@ -49,6 +49,23 @@ and rotate any credential that is ever committed.
 
 ## Installation instructions
 
+Clone the repository, then run the bootstrap script:
+
+```bash
+git clone --recurse-submodules \
+    git@github.com:TheAutoScaler/WorkstationConfig.git "$HOME/Config"
+cd "$HOME/Config"
+./bootstrap.sh
+```
+
+The script installs Ansible when needed and runs the local macOS playbook. Run
+it again at any time to converge the workstation after configuration changes.
+
+Firefox still requires approval of its managed profile in System Settings, and
+applications that use online accounts must be signed in manually.
+
+### Manual installation reference
+
 Install Homebrew:
 
 ```

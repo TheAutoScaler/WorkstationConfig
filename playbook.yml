@@ -1,0 +1,181 @@
+---
+- name: Configure workstation
+  hosts: workstation
+  gather_facts: true
+
+  vars:
+    config_repo: "{{ playbook_dir }}"
+    homebrew_prefix: "{{ '/opt/homebrew' if ansible_architecture == 'arm64' else '/usr/local' }}"
+    brew: "{{ homebrew_prefix }}/bin/brew"
+    formulae: "{{ lookup('file', config_repo + '/brew_formulae_macos').splitlines() | reject('match', '^\\s*(#|$)') | list }}"
+    casks: "{{ lookup('file', config_repo + '/brew_casks').splitlines() | reject('match', '^\\s*(#|$)') | list }}"
+    launch_agents:
+      - dev.prompttab.llama-server
+      - dev.workstation.config-auto-sync
+
+  pre_tasks:
+    - name: Require macOS
+      ansible.builtin.assert:
+        that: ansible_system == 'Darwin'
+        fail_msg: This playbook currently supports macOS only.
+
+    - name: Check for Homebrew
+      ansible.builtin.stat:
+        path: "{{ brew }}"
+      register: homebrew
+
+    - name: Install Homebrew
+      ansible.builtin.command:
+        argv:
+          - /bin/bash
+          - -c
+          - /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      environment:
+        NONINTERACTIVE: "1"
+      when: not homebrew.stat.exists
+      changed_when: true
+
+  tasks:
+    - name: Read installed formulae
+      ansible.builtin.command: "{{ brew }} list --formula --full-name"
+      register: installed_formulae
+      changed_when: false
+
+    - name: Install Homebrew formulae
+      ansible.builtin.command:
+        argv: ["{{ brew }}", install, "{{ item }}"]
+      loop: "{{ formulae }}"
+      when: item not in installed_formulae.stdout_lines
+
+    - name: Read installed casks
+      ansible.builtin.command: "{{ brew }} list --cask --full-name"
+      register: installed_casks
+      changed_when: false
+
+    - name: Install Homebrew casks
+      ansible.builtin.command:
+        argv: ["{{ brew }}", install, --cask, "{{ item }}"]
+      loop: "{{ casks }}"
+      when: item not in installed_casks.stdout_lines
+
+    - name: Initialise pinned submodules
+      ansible.builtin.command:
+        argv: [git, submodule, update, --init, --recursive]
+        chdir: "{{ config_repo }}"
+      register: submodules
+      changed_when: submodules.stdout | length > 0
+
+    - name: Link dotfiles with Stow
+      ansible.builtin.command:
+        argv: ["{{ homebrew_prefix }}/bin/stow", --restow, --dir, "{{ config_repo }}", --target, "{{ ansible_env.HOME }}", dotfiles]
+      changed_when: false
+
+    - name: Configure repository hooks
+      community.general.git_config:
+        name: core.hooksPath
+        value: .githooks
+        scope: local
+        repo: "{{ config_repo }}"
+
+    - name: Install PromptTab
+      ansible.builtin.command:
+        argv: ["{{ config_repo }}/submodules/PromptTab/install.sh"]
+        chdir: "{{ config_repo }}"
+      environment:
+        PROMPTTAB_HOME: "{{ ansible_env.HOME }}/.local/share/prompttab"
+        PROMPTTAB_MANAGE_BASHRC: "0"
+      args:
+        creates: "{{ ansible_env.HOME }}/.local/share/prompttab/bin/prompttab"
+
+    - name: Allow Homebrew Bash as a login shell
+      ansible.builtin.lineinfile:
+        path: /etc/shells
+        line: "{{ homebrew_prefix }}/bin/bash"
+      become: true
+
+    - name: Set Homebrew Bash as the login shell
+      ansible.builtin.user:
+        name: "{{ ansible_user_id }}"
+        shell: "{{ homebrew_prefix }}/bin/bash"
+      become: true
+
+    - name: Open new TextEdit documents by default
+      community.general.osx_defaults:
+        domain: com.apple.TextEdit
+        key: NSShowAppCentricOpenPanelInsteadOfUntitledFile
+        type: bool
+        value: false
+
+    - name: Use plain text in TextEdit
+      community.general.osx_defaults:
+        domain: com.apple.TextEdit
+        key: RichText
+        type: bool
+        value: false
+
+    - name: Disable spell checking in TextEdit
+      community.general.osx_defaults:
+        domain: com.apple.TextEdit
+        key: CheckSpellingWhileTyping
+        type: bool
+        value: false
+
+    - name: Point iTerm2 at the repository preferences
+      community.general.osx_defaults:
+        domain: com.googlecode.iterm2
+        key: PrefsCustomFolder
+        type: string
+        value: "{{ config_repo }}"
+
+    - name: Load iTerm2 repository preferences
+      community.general.osx_defaults:
+        domain: com.googlecode.iterm2
+        key: LoadPrefsFromCustomFolder
+        type: bool
+        value: true
+
+    - name: Inspect installed configuration profiles
+      ansible.builtin.command:
+        argv: [profiles, show, -type, configuration]
+      register: configuration_profiles
+      changed_when: false
+      failed_when: false
+
+    - name: Install the Firefox managed profile
+      ansible.builtin.command:
+        argv: [open, "{{ config_repo }}/firefox-profile/Firefox-Feeling-Lucky.mobileconfig"]
+      when: "'dev.james.firefox.feeling-lucky' not in configuration_profiles.stdout"
+      tags: [firefox]
+
+    - name: Install the Neovim Finder application
+      ansible.builtin.command:
+        argv: ["{{ config_repo }}/NeovimFinder/install.sh"]
+        chdir: "{{ config_repo }}/NeovimFinder"
+      args:
+        creates: /Applications/Neovim.app
+
+    - name: Check loaded launch agents
+      ansible.builtin.command:
+        argv: [launchctl, print, "gui/{{ ansible_user_uid }}/{{ item }}"]
+      loop: "{{ launch_agents }}"
+      register: loaded_agents
+      changed_when: false
+      failed_when: false
+
+    - name: Load launch agents
+      ansible.builtin.command:
+        argv:
+          - launchctl
+          - bootstrap
+          - "gui/{{ ansible_user_uid }}"
+          - "{{ ansible_env.HOME }}/Library/LaunchAgents/{{ item.item }}.plist"
+      loop: "{{ loaded_agents.results }}"
+      when: item.rc != 0
+      loop_control:
+        label: "{{ item.item }}"
+
+    - name: Explain optional automatic sync
+      ansible.builtin.debug:
+        msg: >-
+          Create ~/.config-auto-sync containing a checked-out branch name to
+          enable automatic commits and pushes.
