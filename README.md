@@ -14,39 +14,6 @@ Dotfiles are managed with [GNU Stow](https://www.gnu.org/software/stow/), which
 symlinks them from this repository (cloned on my local machine) to the home
 directory.
 
-### Automatic GitHub sync
-
-The Stow-managed `dev.workstation.config-auto-sync` LaunchAgent checks this
-repository every five minutes, but only on machines with the untracked
-configuration file `~/.config-auto-sync`. Its first line assigns that machine
-a branch. The agent commits and pushes only when that exact branch is checked
-out; an invalid name or branch mismatch stops the sync. Before staging and again before
-committing, it runs Gitleaks; a missing scanner or any finding stops the sync.
-The same check is installed as a Git pre-commit hook for manual commits.
-
-Install the dependency and activate the automation:
-
-```bash
-brew install gitleaks
-printf '%s\n' main > "$HOME/.config-auto-sync"
-cd "$HOME/Config"
-stow --restow dotfiles
-git config core.hooksPath .githooks
-launchctl bootout "gui/$UID/dev.workstation.config-auto-sync" 2>/dev/null || true
-launchctl bootstrap "gui/$UID" \
-    "$HOME/Library/LaunchAgents/dev.workstation.config-auto-sync.plist"
-launchctl kickstart -k "gui/$UID/dev.workstation.config-auto-sync"
-```
-
-Use `main` on the primary machine and a dedicated branch name on each secondary
-machine. Check out the configured branch in `~/Config`; the agent deliberately
-does not switch branches itself. Remove `~/.config-auto-sync` to disable
-automatic commits and pushes without changing the portable dotfiles.
-
-The agent writes diagnostics to `~/Library/Logs/config-auto-sync.log`. Gitleaks
-is a strong safeguard, not a guarantee: keep credentials outside this repository
-and rotate any credential that is ever committed.
-
 ## Installation instructions
 
 Install Homebrew:
@@ -104,12 +71,6 @@ firefox -p # Linux
 
 HINT: `Command+Shift+.` to show hidden files in the file picker on MacOS.
 
-Remove the old Stow policy, if installed:
-
-```
-sudo unlink /Library/Preferences/org.mozilla.firefox.plist
-```
-
 Open `firefox-profile/Firefox-Feeling-Lucky.mobileconfig`, then approve it in
 System Settings under General > Device Management. Restart Firefox and confirm
 the policy at `about:policies`; type `! search terms` to use it.
@@ -145,12 +106,8 @@ Make Bash the default shell:
 
 #### PromptTab
 
-PromptTab is pinned as a Git submodule and installed into its isolated runtime
-directory at `~/.local/share/prompttab`. Shell startup remains version controlled
-through `dotfiles/.bashrc.d/prompttab.sh`, so its installer is told not to edit
-`~/.bashrc` directly.
-
-Install or refresh it with:
+PromptTab provides local AI-powered shell completions. Install or refresh it
+from the pinned submodule:
 
 ```bash
 cd "$HOME/Config"
@@ -162,93 +119,12 @@ PROMPTTAB_MANAGE_BASHRC=0 \
     submodules/PromptTab/install.sh
 ```
 
-The `dotfiles` Stow package owns `prompttab.toml`, including automatic backend
-selection, the local model display name, URL, and generation limits. PromptTab's
-installer owns the remaining runtime files and preserves the existing configuration
-symlink. The file contains no credentials or authentication material.
-
-The tracked fragment loads PromptTab conditionally, so a machine without it
-installed still starts Bash normally. Reload the configuration after installation:
-
-```bash
-source "$HOME/.bashrc"
-```
-
-PromptTab's local backend uses Homebrew's `llama.cpp` and a resident
-`llama-server`. The selected model is Qwen2.5-Coder-1.5B Base Q5_K_M. llama.cpp
-downloads and caches that model automatically from Hugging Face when first started:
-
-```bash
-brew install llama.cpp
-llama-server \
-    -hf MaziyarPanahi/Qwen2.5-Coder-1.5B-GGUF:Q5_K_M \
-    --host 127.0.0.1 --port 8012 \
-    --n-gpu-layers 99 --ctx-size 2048 --parallel 1 --cache-reuse 256 \
-    --cors-origins http://127.0.0.1:8012 --no-webui
-```
-
-The server is managed at login by the Stow-tracked user LaunchAgent
-`~/Library/LaunchAgents/dev.prompttab.llama-server.plist`. It binds only to
-loopback, disables the llama.cpp web UI, keeps one model resident for low latency,
-and restarts automatically if it exits. Its Stow-managed launcher derives the log
-path from `$HOME`, so the setup does not assume a macOS account name. Install or
-refresh the configuration and agent with:
-
-```bash
-cd "$HOME/Config"
-stow --restow dotfiles
-launchctl bootout "gui/$UID/dev.prompttab.llama-server" 2>/dev/null || true
-launchctl bootstrap "gui/$UID" \
-    "$HOME/Library/LaunchAgents/dev.prompttab.llama-server.plist"
-launchctl kickstart -k "gui/$UID/dev.prompttab.llama-server"
-```
-
-The first start may take longer while the model downloads. Check readiness and
-logs with:
-
-```bash
-curl -fsS http://127.0.0.1:8012/health
-tail -f "$HOME/Library/Logs/prompttab-llama.log"
-```
+Its configuration and local `llama.cpp` service are managed by the dotfiles.
 
 ### Neovim additions
 
-The Neovim setup is intended to be portable to a newly provisioned machine
-without making the editor fragile. Neovim should always remain usable for core
-editing, even before every plugin and external tool has been installed. Once
-the machine is fully provisioned, the same configuration should be quiet,
-reproducible, and require no machine-local setup that has been forgotten or
-left outside this repository.
-
-The design therefore aims to:
-
-- keep trusted plugin revisions explicit and reproducible;
-- surface missing assumptions without turning them into startup failures;
-- show one concise warning instead of flooding the screen;
-- provide an explicit health report when details are needed;
-- preserve user content when formatters fail; and
-- track human-editable source while regenerating derived files locally.
-
-Neovim plugins are pinned as Git submodules and linked into Neovim's native
-package directory by Stow. Update them deliberately by checking out a reviewed
-revision inside the submodule and committing the resulting submodule pointer.
-
-The configuration is designed to remain usable while a new machine is only
-partially provisioned. Optional plugins, language servers, formatters, their
-secondary runtimes, clipboard support, the minimum Neovim version, and an
-installed Nerd Font are checked during startup. Missing assumptions produce
-one non-fatal warning; use `:ConfigHealth` or `:messages` for the full list.
-Option-as-Meta remains a manual check because Neovim cannot inspect terminal
-keyboard translation before a key is pressed.
-
-Formatting runs against the in-memory buffer before saving. Formatter commands
-receive content through standard input and the buffer is changed only after a
-successful result, preventing failed tools from damaging content or leaving
-the editor out of sync with the file on disk.
-
-The personal spelling word list is tracked as readable source. Neovim rebuilds
-its generated `.spl` file on startup only when the compiled file is absent or
-older than the source, so generated machine data does not need to be committed.
+Run `:ConfigHealth` to inspect configuration dependencies and optional tools.
+Use `:messages` to review any startup warnings from the current session.
 
 ### TextEdit
 
@@ -271,21 +147,7 @@ defaults write com.apple.TextEdit NSShowAppCentricOpenPanelInsteadOfUntitledFile
 
 ## Ghostty
 
-Ghostty reads its version-controlled configuration from
-`~/.config/ghostty/config`, which GNU Stow links to
-`~/Config/dotfiles/.config/ghostty/config` with the rest of the dotfiles.
-
-The configuration reproduces the former iTerm2 profile's Hack Nerd Font Mono
-at 14 pt, 110-column by 35-row initial window size, Solarized Light theme, and
-1,000-line scrollback limit.
-
-Left Option acts as terminal Meta so shell and editor shortcuts continue to
-work, while Right Option retains normal macOS character composition. The
-explicit Option-3 mapping preserves access to `#` on a UK keyboard despite
-using Left Option as Meta. Shift-Enter is intentionally left at Ghostty's
-default rather than carrying over iTerm2's old explicit newline mapping.
-
-Reload the configuration in a running Ghostty window with `Command-Shift-,`.
+The Ghostty configuration is a clone of the iTerm2 configuration.
 
 ### Open Markdown and text files in Neovim from Finder
 
@@ -305,3 +167,20 @@ cd "$HOME/Config/NeovimFinder"
 The default installation is `/Applications/Neovim.app`. See
 `NeovimFinder/README.md` for prerequisites, installation overrides, and
 removal instructions.
+
+### Automatic GitHub sync
+
+The Stow-managed LaunchAgent commits and pushes this repository every five
+minutes on the branch named in `~/.config-auto-sync`. It runs Gitleaks before
+committing and logs to `~/Library/Logs/config-auto-sync.log`; remove the
+configuration file to disable syncing.
+
+```bash
+brew install gitleaks
+printf '%s\n' main > "$HOME/.config-auto-sync"
+cd "$HOME/Config"
+stow --restow dotfiles
+git config core.hooksPath .githooks
+launchctl bootstrap "gui/$UID" \
+    "$HOME/Library/LaunchAgents/dev.workstation.config-auto-sync.plist"
+```
