@@ -16,6 +16,40 @@ directory.
 
 ## Installation instructions
 
+Clone the repository, then run the bootstrap script:
+
+```bash
+git clone --recurse-submodules \
+    git@github.com:TheAutoScaler/WorkstationConfig.git "$HOME/Config"
+cd "$HOME/Config"
+./bootstrap.sh
+```
+
+The script installs Ansible when needed and runs the local macOS playbook. Run
+it again at any time to converge the workstation after configuration changes.
+
+To enable automatic GitHub sync, write the branch to sync to
+`~/.config-auto-sync` before or after running Ansible:
+
+```bash
+printf '%s\n' main > "$HOME/.config-auto-sync"
+```
+
+Use `main` on the primary workstation and a dedicated checked-out branch on
+each secondary workstation.
+
+### Complete interactive setup
+
+After Ansible finishes:
+
+- complete the [Firefox setup](#firefox);
+- approve any macOS privacy, extension, or background-service prompts opened by
+  installed applications.
+
+Ansible prints this checklist at the end of each run.
+
+## Manual installation reference
+
 Install Homebrew:
 
 ```
@@ -93,7 +127,7 @@ git submodule update --init --recursive
 `cd` into the repository and install dotfiles:
 
 ```
-stow --adopt dotfiles
+stow --restow dotfiles
 ```
 
 ### Bash
@@ -137,6 +171,8 @@ defaults write com.apple.TextEdit NSShowAppCentricOpenPanelInsteadOfUntitledFile
 ```
 
 ## Restore iTerm2 settings
+
+NOTE: iTerm2 is deprecated in favour of Ghostty.
 
 - Settings > General > Settings > Load preferences from a custom folder or URL
 
