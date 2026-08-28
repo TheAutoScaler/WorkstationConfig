@@ -287,6 +287,8 @@ defaults write com.apple.TextEdit NSShowAppCentricOpenPanelInsteadOfUntitledFile
 
 ## Restore iTerm2 settings
 
+NOTE: iTerm2 is deprecated in favour of Ghostty.
+
 - Settings > General > Settings > Load preferences from a custom folder or URL
 
 - Point at the location where this was closed to (perhaps `~/Config`).
