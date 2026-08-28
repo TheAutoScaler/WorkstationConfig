@@ -174,8 +174,11 @@
       loop_control:
         label: "{{ item.item }}"
 
-    - name: Explain optional automatic sync
+    - name: Show manual completion checklist
       ansible.builtin.debug:
         msg: >-
-          Create ~/.config-auto-sync containing a checked-out branch name to
-          enable automatic commits and pushes.
+          Manual completion: approve the Firefox profile in System Settings and
+          select ~/.firefox_profile in Firefox; approve any macOS privacy,
+          extension, or background-service prompts; and sign in to applications.
+          Optional: create ~/.config-auto-sync containing the checked-out branch
+          name to enable automatic commits and pushes.

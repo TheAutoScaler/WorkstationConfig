@@ -61,10 +61,19 @@ cd "$HOME/Config"
 The script installs Ansible when needed and runs the local macOS playbook. Run
 it again at any time to converge the workstation after configuration changes.
 
-Firefox still requires approval of its managed profile in System Settings, and
-applications that use online accounts must be signed in manually.
+### Complete interactive setup
 
-### Manual installation reference
+After Ansible finishes:
+
+- approve the Firefox profile in System Settings under General > Device
+  Management, then create or select the Firefox profile at `~/.firefox_profile`;
+- approve any macOS privacy, extension, or background-service prompts opened by
+  installed applications; and
+- sign in to applications that use online accounts.
+
+Ansible prints this checklist at the end of each run.
+
+## Manual installation reference
 
 Install Homebrew:
 
