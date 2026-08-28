@@ -65,16 +65,7 @@ it again at any time to converge the workstation after configuration changes.
 
 After Ansible finishes:
 
-- open Firefox Profile Manager, create a profile at `~/.firefox_profile`, and
-  set it as the default:
-
-  ```bash
-  firefox -p # Linux
-  /Applications/Firefox.app/Contents/MacOS/firefox -p # macOS via Homebrew
-  ```
-
-- approve the Firefox profile in System Settings under General > Device
-  Management;
+- complete the [Firefox setup](#firefox);
 - approve any macOS privacy, extension, or background-service prompts opened by
   installed applications; and
 - sign in to applications that use online accounts.
