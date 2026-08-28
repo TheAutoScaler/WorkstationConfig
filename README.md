@@ -61,14 +61,23 @@ cd "$HOME/Config"
 The script installs Ansible when needed and runs the local macOS playbook. Run
 it again at any time to converge the workstation after configuration changes.
 
+To enable automatic GitHub sync, write the branch to sync to
+`~/.config-auto-sync` before or after running Ansible:
+
+```bash
+printf '%s\n' main > "$HOME/.config-auto-sync"
+```
+
+Use `main` on the primary workstation and a dedicated checked-out branch on
+each secondary workstation.
+
 ### Complete interactive setup
 
 After Ansible finishes:
 
 - complete the [Firefox setup](#firefox);
 - approve any macOS privacy, extension, or background-service prompts opened by
-  installed applications; and
-- sign in to applications that use online accounts.
+  installed applications.
 
 Ansible prints this checklist at the end of each run.
 
