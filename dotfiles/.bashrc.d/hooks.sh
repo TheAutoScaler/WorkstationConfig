@@ -1,16 +1,28 @@
 #!/usr/bin/env bash
 
 if command -v starship &>/dev/null; then
-	eval "$(starship init bash)"
-	function set_win_title() {
+	if [[ -z "${STARSHIP_AWS_CACHE_DIR:-}" ]]; then
+		STARSHIP_AWS_CACHE_DIR="$(
+			mktemp -d "${TMPDIR:-/tmp}/starship-aws.XXXXXX"
+		)"
+		export STARSHIP_AWS_CACHE_DIR
+		trap 'rm -rf "$STARSHIP_AWS_CACHE_DIR"' EXIT
+	fi
+
+	set_win_title() {
+		local title
+
 		if [[ "$PWD" == "$HOME" ]]; then
-			local title="~"
+			title="~"
 		else
-			local title=$(basename "$PWD")
+			title="$(basename "$PWD")"
 		fi
-		echo -ne "\033]0; $title \007"
+
+		printf '\033]0; %s \007' "$title"
 	}
+
 	starship_precmd_user_func="set_win_title"
+	eval "$(starship init bash)"
 fi
 
 if command -v direnv &>/dev/null; then
