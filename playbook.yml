@@ -9,6 +9,7 @@
     brew: "{{ homebrew_prefix }}/bin/brew"
     formulae: "{{ lookup('file', config_repo + '/brew_formulae_macos').splitlines() | reject('match', '^\\s*(#|$)') | list }}"
     casks: "{{ lookup('file', config_repo + '/brew_casks').splitlines() | reject('match', '^\\s*(#|$)') | list }}"
+    uv_tools: "{{ lookup('file', config_repo + '/uv_tools').splitlines() | reject('match', '^\\s*(#|$)') | list }}"
     launch_agents:
       - dev.prompttab.llama-server
       - dev.workstation.config-auto-sync
@@ -46,6 +47,18 @@
         argv: ["{{ brew }}", install, "{{ item }}"]
       loop: "{{ formulae }}"
       when: item not in installed_formulae.stdout_lines
+
+    - name: Read installed uv tools
+      ansible.builtin.command:
+        argv: ["{{ homebrew_prefix }}/bin/uv", tool, list]
+      register: installed_uv_tools
+      changed_when: false
+
+    - name: Install uv tools
+      ansible.builtin.command:
+        argv: ["{{ homebrew_prefix }}/bin/uv", tool, install, "{{ item }}"]
+      loop: "{{ uv_tools }}"
+      when: installed_uv_tools.stdout_lines | select('match', '^' + (item | regex_escape) + ' v') | list | length == 0
 
     - name: Read installed casks
       ansible.builtin.command: "{{ brew }} list --cask --full-name"
