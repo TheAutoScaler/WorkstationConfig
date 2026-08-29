@@ -62,13 +62,15 @@ Manually activate Homebrew in the shell:
 eval "$(/opt/homebrew/bin/brew shellenv)"
 ```
 
-Fetch `brew_formulae_macos` and `brew_casks`:
+Fetch `brew_formulae_macos`, `brew_casks`, and `uv_tools`:
 
 ```
 curl -O \
     https://raw.githubusercontent.com/JamesLochhead/workstation_setup/main/brew_formulae_macos
 curl -O \
     https://raw.githubusercontent.com/JamesLochhead/workstation_setup/main/brew_casks
+curl -O \
+    https://raw.githubusercontent.com/JamesLochhead/workstation_setup/main/uv_tools
 ```
 
 Install software using Homebrew:
@@ -76,6 +78,7 @@ Install software using Homebrew:
 ```
 xargs brew install < brew_formulae_macos
 xargs brew install < brew_casks
+xargs -n 1 uv tool install < uv_tools
 ```
 
 The shell activates Homebrew only after checking the ownership and permissions
