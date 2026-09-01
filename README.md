@@ -40,6 +40,8 @@ each secondary workstation.
 
 ### Complete interactive setup
 
+While Ansible runs, accept the IINA default-application prompts shown by macOS.
+
 After Ansible finishes:
 
 - complete the [Firefox setup](#firefox);
@@ -172,6 +174,16 @@ Use `:messages` to review any startup warnings from the current session.
 ```
 defaults write com.apple.TextEdit NSShowAppCentricOpenPanelInsteadOfUntitledFile -bool false
 ```
+
+### IINA
+
+Ansible installs IINA and uses `utiluti` to make it the default application for
+common local audio and video formats. The tracked associations are in
+`default-apps/iina-types.plist`; re-running Ansible only changes associations
+that have drifted.
+
+macOS 26.4 and later asks for confirmation before each changed media type. The
+playbook waits for those dialogs, so accept them to let the run continue.
 
 ## Restore iTerm2 settings
 

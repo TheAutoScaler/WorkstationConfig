@@ -71,6 +71,14 @@
       loop: "{{ casks }}"
       when: item not in installed_casks.stdout_lines
 
+    - name: Set IINA as the default media application
+      ansible.builtin.command:
+        argv: ["{{ config_repo }}/default-apps/configure-iina.sh"]
+      environment:
+        IINA_HOMEBREW_PREFIX: "{{ homebrew_prefix }}"
+      register: iina_defaults
+      changed_when: "'Changed associations: 0' not in iina_defaults.stdout"
+
     - name: Initialise pinned submodules
       ansible.builtin.command:
         argv: [git, submodule, update, --init, --recursive]

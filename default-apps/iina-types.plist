@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Video -->
+	<key>extension:3g2</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:3gp</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:avi</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:flv</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:m2ts</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:m4v</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:mkv</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:mov</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:mp4</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:mpeg</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:mpg</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:mts</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:ogv</key>
+	<string>com.colliderli.iina</string>
+	<key>public.mpeg-2-transport-stream</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:vob</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:webm</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:wmv</key>
+	<string>com.colliderli.iina</string>
+
+	<!-- Audio -->
+	<key>extension:aac</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:ac3</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:aif</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:aiff</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:ape</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:caf</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:flac</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:m4a</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:mka</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:mp3</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:oga</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:ogg</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:opus</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:wav</key>
+	<string>com.colliderli.iina</string>
+	<key>extension:wma</key>
+	<string>com.colliderli.iina</string>
+</dict>
+</plist>
