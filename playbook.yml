@@ -110,17 +110,30 @@
       args:
         creates: "{{ ansible_env.HOME }}/.local/share/prompttab/bin/prompttab"
 
+    - name: Check whether Homebrew Bash is an allowed login shell
+      ansible.builtin.command:
+        argv:
+          - /usr/bin/grep
+          - -Fxq
+          - "{{ homebrew_prefix }}/bin/bash"
+          - /etc/shells
+      register: homebrew_bash_allowed
+      changed_when: false
+      failed_when: homebrew_bash_allowed.rc not in [0, 1]
+
     - name: Allow Homebrew Bash as a login shell
       ansible.builtin.lineinfile:
         path: /etc/shells
         line: "{{ homebrew_prefix }}/bin/bash"
       become: true
+      when: homebrew_bash_allowed.rc != 0
 
     - name: Set Homebrew Bash as the login shell
       ansible.builtin.user:
         name: "{{ ansible_user_id }}"
         shell: "{{ homebrew_prefix }}/bin/bash"
       become: true
+      when: ansible_user_shell != homebrew_prefix + '/bin/bash'
 
     - name: Open new TextEdit documents by default
       community.general.osx_defaults:
@@ -133,8 +146,8 @@
       community.general.osx_defaults:
         domain: com.apple.TextEdit
         key: RichText
-        type: bool
-        value: false
+        type: int
+        value: 0
 
     - name: Disable spell checking in TextEdit
       community.general.osx_defaults:
