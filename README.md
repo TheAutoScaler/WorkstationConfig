@@ -182,6 +182,10 @@ common local audio and video formats. The tracked associations are in
 `default-apps/iina-types.plist`; re-running Ansible only changes associations
 that have drifted.
 
+The setup also removes alternate-name metadata added to IINA's signed CLI
+helper by Homebrew, which otherwise prevents Launch Services from accepting the
+application's signature on current macOS releases.
+
 macOS 26.4 and later asks for confirmation before each changed media type. The
 playbook waits for those dialogs, so accept them to let the run continue.
 

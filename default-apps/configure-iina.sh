@@ -18,8 +18,15 @@ fi
 utiluti_bin="$iina_brew_prefix/bin/utiluti"
 jq_bin="$iina_brew_prefix/bin/jq"
 launch_services="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+iina_cli="$iina_app/Contents/MacOS/iina-cli"
 
-for dependency in /usr/bin/plutil "$utiluti_bin" "$jq_bin" "$launch_services"; do
+for dependency in \
+    /usr/bin/codesign \
+    /usr/bin/plutil \
+    /usr/bin/xattr \
+    "$utiluti_bin" \
+    "$jq_bin" \
+    "$launch_services"; do
     if [[ ! -x "$dependency" ]]; then
         echo "Missing required executable: $dependency" >&2
         exit 1
@@ -32,6 +39,14 @@ if [[ ! -d "$iina_app" ]]; then
 fi
 
 /usr/bin/plutil -lint "$types_file" >/dev/null
+
+metadata_changed=0
+if /usr/bin/xattr -p com.apple.metadata:kMDItemAlternateNames \
+    "$iina_cli" >/dev/null 2>&1; then
+    /usr/bin/xattr -d com.apple.metadata:kMDItemAlternateNames "$iina_cli"
+    metadata_changed=1
+fi
+/usr/bin/codesign --verify --deep --strict "$iina_app"
 "$launch_services" -f "$iina_app"
 
 registered_apps="$("$utiluti_bin" app for-id "$iina_bundle_id")"
@@ -89,3 +104,4 @@ while IFS=$'\t' read -r association expected_bundle_id; do
 done <<< "$association_data"
 
 echo "Changed associations: $changed"
+echo "Repaired app metadata: $metadata_changed"
