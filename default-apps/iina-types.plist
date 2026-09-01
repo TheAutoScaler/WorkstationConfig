@@ -25,11 +25,7 @@
 	<string>com.colliderli.iina</string>
 	<key>extension:mpg</key>
 	<string>com.colliderli.iina</string>
-	<key>extension:mts</key>
-	<string>com.colliderli.iina</string>
 	<key>extension:ogv</key>
-	<string>com.colliderli.iina</string>
-	<key>public.mpeg-2-transport-stream</key>
 	<string>com.colliderli.iina</string>
 	<key>extension:vob</key>
 	<string>com.colliderli.iina</string>
