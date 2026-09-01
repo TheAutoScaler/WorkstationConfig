@@ -6,6 +6,7 @@ coreutils
 cue
 diffutils
 docker
+docker-buildx
 duti
 eslint
 fd
