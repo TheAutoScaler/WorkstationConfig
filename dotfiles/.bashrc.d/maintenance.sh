@@ -37,10 +37,11 @@ if type -P brew &>/dev/null; then
 
 		command brew "$@"
 		status=$?
-		if ((status == 0)) \
-			&& { workstation_maintenance_has_argument update "$@" \
-				|| workstation_maintenance_has_argument upgrade "$@"; }; then
-			record_workstation_maintenance brew
+		if ((status == 0)) && workstation_maintenance_has_argument update "$@"; then
+			record_workstation_maintenance brew-check
+		fi
+		if ((status == 0)) && workstation_maintenance_has_argument upgrade "$@"; then
+			record_workstation_maintenance brew-upgrade
 		fi
 		return "$status"
 	}
@@ -73,7 +74,7 @@ workstation_maintenance() {
 		softwareupdate --list || status=$?
 	fi
 	if ((status == 0)); then
-		printf 'Maintenance checks completed; reminders reset.\n'
+		printf 'Maintenance checks completed.\n'
 	fi
 
 	return "$status"
@@ -88,10 +89,17 @@ workstation_maintenance_reminder() {
 	local remind_after=$((7 * 24 * 60 * 60))
 
 	now=$(date +%s)
-	for component in brew softwareupdate; do
-		type -P "$component" &>/dev/null || continue
+	for component in brew-check brew-upgrade softwareupdate; do
+		if [[ "$component" == brew-* ]]; then
+			type -P brew &>/dev/null || continue
+		else
+			type -P "$component" &>/dev/null || continue
+		fi
 		last_run=0
 		maintenance_file=$(workstation_maintenance_file "$component")
+		if [[ "$component" == brew-check && ! -r "$maintenance_file" ]]; then
+			maintenance_file=$(workstation_maintenance_file brew)
+		fi
 		if [[ -r "$maintenance_file" ]]; then
 			read -r last_run < "$maintenance_file"
 			[[ "$last_run" =~ ^[0-9]+$ ]] || last_run=0
@@ -102,7 +110,22 @@ workstation_maintenance_reminder() {
 	done
 
 	if ((${#overdue[@]})); then
-		printf '\n🧰 Maintenance overdue: %s\n\n' "${overdue[*]}"
+		printf '\n🧰 Maintenance overdue:\n'
+		for component in "${overdue[@]}"; do
+			case "$component" in
+			brew-check)
+				printf '  brew update && brew outdated\n'
+				;;
+			brew-upgrade)
+				printf '  brew upgrade\n'
+				;;
+			softwareupdate)
+				printf '  softwareupdate --list\n'
+				printf '  sudo softwareupdate --install --all\n'
+				;;
+			esac
+		done
+		printf '\n'
 	fi
 }
 
