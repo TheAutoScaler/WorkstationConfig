@@ -43,6 +43,7 @@ lzo
 make
 marksman
 neovim
+ngrok
 node
 ollama
 opa
