@@ -43,6 +43,9 @@ if type -P brew &>/dev/null; then
 		if ((status == 0)) && workstation_maintenance_has_argument upgrade "$@"; then
 			record_workstation_maintenance brew-upgrade
 		fi
+		if ((status == 0)) && workstation_maintenance_has_argument doctor "$@"; then
+			record_workstation_maintenance brew-doctor
+		fi
 		return "$status"
 	}
 fi
@@ -89,7 +92,7 @@ workstation_maintenance_reminder() {
 	local remind_after=$((7 * 24 * 60 * 60))
 
 	now=$(date +%s)
-	for component in brew-check brew-upgrade softwareupdate; do
+	for component in brew-check brew-upgrade brew-doctor softwareupdate; do
 		if [[ "$component" == brew-* ]]; then
 			type -P brew &>/dev/null || continue
 		else
@@ -118,6 +121,9 @@ workstation_maintenance_reminder() {
 				;;
 			brew-upgrade)
 				printf '  brew upgrade\n'
+				;;
+			brew-doctor)
+				printf '  brew doctor\n'
 				;;
 			softwareupdate)
 				printf '  softwareupdate --list\n'
