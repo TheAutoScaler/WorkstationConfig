@@ -43,7 +43,7 @@ if type -P brew &>/dev/null; then
 		if ((status == 0)) && workstation_maintenance_has_argument upgrade "$@"; then
 			record_workstation_maintenance brew-upgrade
 		fi
-		if ((status == 0)) && workstation_maintenance_has_argument doctor "$@"; then
+		if workstation_maintenance_has_argument doctor "$@"; then
 			record_workstation_maintenance brew-doctor
 		fi
 		return "$status"
