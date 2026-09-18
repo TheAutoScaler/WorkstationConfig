@@ -98,17 +98,20 @@ such as third-party tap trust decisions.
 
 ### Codebase Memory
 
-After installing `npm_tools`, configure Codebase Memory manually:
+After installing `npm_tools`, ensure the Codex CLI is on `PATH`, then configure
+Codebase Memory manually:
 
 ```bash
 codebase-memory-mcp install
 codebase-memory-mcp config set auto_index true
 codebase-memory-mcp config set auto_watch true
 codebase-memory-mcp config set watcher_enabled true
+codex mcp add codebase-memory -- "$HOME/.local/bin/codebase-memory-mcp"
 ```
 
 These commands register integrations for detected coding agents, enable indexing
-on new sessions, register projects for watching, and enable the watcher.
+on new sessions, register projects for watching, enable the watcher, and explicitly
+register the user-local executable with Codex as `codebase-memory`.
 See the [upstream configuration reference](https://github.com/DeusData/codebase-memory-mcp/blob/main/docs/CONFIGURATION.md).
 
 Alternatively, run the same steps from the repository:

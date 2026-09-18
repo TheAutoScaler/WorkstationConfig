@@ -9,8 +9,14 @@ if ! command -v codebase-memory-mcp >/dev/null 2>&1; then
     exit 1
 fi
 
+if ! command -v codex >/dev/null 2>&1; then
+    printf '%s\n' 'Install the Codex CLI before running this script.' >&2
+    exit 1
+fi
+
 # Forward installer options, including --yes for unattended setup.
 codebase-memory-mcp install "$@"
 codebase-memory-mcp config set auto_index true
 codebase-memory-mcp config set auto_watch true
 codebase-memory-mcp config set watcher_enabled true
+codex mcp add codebase-memory -- "$HOME/.local/bin/codebase-memory-mcp"
