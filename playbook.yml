@@ -10,6 +10,7 @@
     formulae: "{{ lookup('file', config_repo + '/brew_formulae_macos').splitlines() | reject('match', '^\\s*(#|$)') | list }}"
     casks: "{{ lookup('file', config_repo + '/brew_casks').splitlines() | reject('match', '^\\s*(#|$)') | list }}"
     uv_tools: "{{ lookup('file', config_repo + '/uv_tools').splitlines() | reject('match', '^\\s*(#|$)') | list }}"
+    npm_tools: "{{ lookup('file', config_repo + '/npm_tools').splitlines() | reject('match', '^\\s*(#|$)') | list }}"
     launch_agents:
       - dev.prompttab.llama-server
       - dev.workstation.config-auto-sync
@@ -60,6 +61,17 @@
       loop: "{{ uv_tools }}"
       when: installed_uv_tools.stdout_lines | select('match', '^' + (item | regex_escape) + ' v') | list | length == 0
 
+    - name: Install npm tools
+      community.general.npm:
+        name: "{{ item }}"
+        global: true
+        state: present
+        executable: "{{ homebrew_prefix }}/bin/npm"
+      loop: "{{ npm_tools }}"
+      environment:
+        npm_config_prefix: "{{ ansible_env.HOME }}/.local"
+        PATH: "{{ homebrew_prefix }}/bin:{{ ansible_env.PATH }}"
+
     - name: Read installed casks
       ansible.builtin.command: "{{ brew }} list --cask --full-name"
       register: installed_casks
@@ -99,6 +111,15 @@
         value: .githooks
         scope: local
         repo: "{{ config_repo }}"
+
+    - name: Configure Codebase Memory
+      ansible.builtin.command:
+        argv: ["{{ config_repo }}/setup-codebase-memory.sh", --yes]
+      environment:
+        npm_config_prefix: "{{ ansible_env.HOME }}/.local"
+        PATH: "{{ homebrew_prefix }}/bin:{{ ansible_env.PATH }}"
+      when: "'codebase-memory-mcp' in npm_tools"
+      changed_when: true
 
     - name: Install PromptTab
       ansible.builtin.command:
