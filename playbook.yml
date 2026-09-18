@@ -112,15 +112,6 @@
         scope: local
         repo: "{{ config_repo }}"
 
-    - name: Configure Codebase Memory
-      ansible.builtin.command:
-        argv: ["{{ config_repo }}/setup-codebase-memory.sh", --yes]
-      environment:
-        npm_config_prefix: "{{ ansible_env.HOME }}/.local"
-        PATH: "{{ homebrew_prefix }}/bin:{{ ansible_env.PATH }}"
-      when: "'codebase-memory-mcp' in npm_tools"
-      changed_when: true
-
     - name: Install PromptTab
       ansible.builtin.command:
         argv: ["{{ config_repo }}/submodules/PromptTab/install.sh"]

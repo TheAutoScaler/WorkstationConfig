@@ -27,8 +27,7 @@ cd "$HOME/Config"
 
 The script installs Ansible when needed and runs the local macOS playbook. Run
 it again at any time to converge the workstation after configuration changes.
-It installs global npm packages from `npm_tools` into `~/.local` and runs
-`setup-codebase-memory.sh --yes` to configure Codebase Memory automatically.
+It installs global npm packages from `npm_tools` into `~/.local`.
 
 To enable automatic GitHub sync, write the branch to sync to
 `~/.config-auto-sync` before or after running Ansible:
@@ -87,7 +86,9 @@ xargs brew install < brew_casks
 xargs -n 1 uv tool install < uv_tools
 export npm_config_prefix="$HOME/.local"
 export PATH="$npm_config_prefix/bin:$PATH"
-xargs -n 1 npm install --global < npm_tools
+while IFS= read -r package; do
+    [ -z "$package" ] || npm install --global "$package"
+done < npm_tools
 ```
 
 The shell activates Homebrew only after checking the ownership and permissions
@@ -95,36 +96,6 @@ of `/opt`, `/opt/homebrew`, its `bin` directory, and the `brew` executable.
 These checks retain the protection against a hostile world-writable install
 path without claiming `~/.homebrew`, which Homebrew uses for user configuration
 such as third-party tap trust decisions.
-
-### Codebase Memory
-
-After installing `npm_tools`, ensure the Codex CLI is on `PATH`, then configure
-Codebase Memory manually:
-
-```bash
-codebase-memory-mcp install
-codebase-memory-mcp config set auto_index true
-codebase-memory-mcp config set auto_watch true
-codebase-memory-mcp config set watcher_enabled true
-codex mcp add codebase-memory -- "$HOME/.local/bin/codebase-memory-mcp"
-```
-
-These commands register integrations for detected coding agents, enable indexing
-on new sessions, register projects for watching, enable the watcher, and explicitly
-register the user-local executable with Codex as `codebase-memory`.
-See the [upstream configuration reference](https://github.com/DeusData/codebase-memory-mcp/blob/main/docs/CONFIGURATION.md).
-
-Alternatively, run the same steps from the repository:
-
-```bash
-./setup-codebase-memory.sh
-# Unattended setup (also used by the Ansible playbook):
-./setup-codebase-memory.sh --yes
-```
-
-Restart your coding agents after setup. If an existing daemon was started with
-watching disabled, run `codebase-memory-mcp daemon stop`; the next session starts
-a daemon with the new setting.
 
 
 ### Firefox
