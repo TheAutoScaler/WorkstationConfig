@@ -50,6 +50,43 @@ if type -P brew &>/dev/null; then
 	}
 fi
 
+if type -P npm &>/dev/null; then
+	npm() {
+		local status
+
+		command npm "$@"
+		status=$?
+		if ((status == 0)) \
+			&& { workstation_maintenance_has_argument update "$@" \
+				|| workstation_maintenance_has_argument upgrade "$@" \
+				|| workstation_maintenance_has_argument up "$@"; } \
+			&& { workstation_maintenance_has_argument --global "$@" \
+				|| workstation_maintenance_has_argument -g "$@"; } \
+			&& ! workstation_maintenance_has_argument --dry-run "$@" \
+			&& ! workstation_maintenance_has_argument --help "$@" \
+			&& ! workstation_maintenance_has_argument -h "$@"; then
+			record_workstation_maintenance npm
+		fi
+		return "$status"
+	}
+fi
+
+if type -P uv &>/dev/null; then
+	uv() {
+		local status
+
+		command uv "$@"
+		status=$?
+		if ((status == 0)) && [[ "${1:-}" == tool && "${2:-}" == upgrade ]] \
+			&& workstation_maintenance_has_argument --all "$@" \
+			&& ! workstation_maintenance_has_argument --help "$@" \
+			&& ! workstation_maintenance_has_argument -h "$@"; then
+			record_workstation_maintenance uv
+		fi
+		return "$status"
+	}
+fi
+
 if type -P softwareupdate &>/dev/null; then
 	softwareupdate() {
 		local status
@@ -92,7 +129,7 @@ workstation_maintenance_reminder() {
 	local remind_after=$((7 * 24 * 60 * 60))
 
 	now=$(date +%s)
-	for component in brew-check brew-upgrade brew-doctor softwareupdate; do
+	for component in brew-check brew-upgrade brew-doctor npm uv softwareupdate; do
 		if [[ "$component" == brew-* ]]; then
 			type -P brew &>/dev/null || continue
 		else
@@ -124,6 +161,12 @@ workstation_maintenance_reminder() {
 				;;
 			brew-doctor)
 				printf '  brew doctor\n'
+				;;
+			npm)
+				printf '  npm update --global\n'
+				;;
+			uv)
+				printf '  uv tool upgrade --all\n'
 				;;
 			softwareupdate)
 				printf '  softwareupdate --list\n'
